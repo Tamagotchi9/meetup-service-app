@@ -4,9 +4,9 @@
       type="button"
       class="page-tabs__tab"
       :class="{
-        'page-tabs__tab_active': selected === '' || selected === 'list'
+        'page-tabs__tab_active': view === '' || view === 'list',
       }"
-      @click="select('list')"
+      @click="$emit('update:view', 'list')"
     >
       <svg
         fill="none"
@@ -25,8 +25,8 @@
     <button
       type="button"
       class="page-tabs__tab"
-      :class="{ 'page-tabs__tab_active': selected === 'calendar' }"
-      @click="select('calendar')"
+      :class="{ 'page-tabs__tab_active': view === 'calendar' }"
+      @click="$emit('update:view', 'calendar')"
     >
       <svg
         height="22"
@@ -49,14 +49,14 @@ export default {
   name: "PageTabs",
 
   props: {
-    selected: String
+    view: String,
   },
 
   methods: {
     select(name) {
       this.$emit("update:selected", name);
-    }
-  }
+    },
+  },
 };
 </script>
 

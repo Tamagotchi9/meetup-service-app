@@ -26,12 +26,12 @@ const routes = [
     name: "index",
     alias: "/meetups",
     redirect: { name: "meetups" },
-    component: () => import("@/views/MeetupsPage")
+    // component: () => import("@/views/MeetupsPage")
   },
   {
     path: "/register",
     name: "register",
-    component: () => import("@/views/LoginPage")
+    component: () => import("@/views/RegisterPage")
   },
   {
     path: "/login",

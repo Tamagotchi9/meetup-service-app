@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="wrapper bg-grey">
     <Header />
     <main class="main">
       <slot />
@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import Header from "./TheHeader";
-import Footer from "./TheFooter";
+import Header from "../components/TheHeader";
+import Footer from "../components/TheFooter";
 export default {
   name: "BaseLayout",
   components: {

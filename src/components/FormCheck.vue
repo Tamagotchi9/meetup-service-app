@@ -10,8 +10,8 @@
         type="radio"
         name="date"
         :value="option.value"
-        :checked="option.value === selected"
-        @input="$emit('change', option.value)"
+        :checked="option.value === date"
+        @input="$emit('update:date', option.value)"
       />
       <label class="form-check__label">{{ option.text }}</label>
     </div>
@@ -20,21 +20,21 @@
 
 <script>
 export default {
-  name: 'FormCheck',
+  name: "FormCheck",
 
   props: {
     options: {
       type: Array,
       required: true,
     },
-    selected: {
+    date: {
       type: String,
     },
   },
 
   model: {
-    prop: 'selected',
-    event: 'change',
+    prop: "selected",
+    event: "change",
   },
 };
 </script>

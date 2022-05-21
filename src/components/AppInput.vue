@@ -13,7 +13,6 @@
       class="form-control"
       :class="{ 'form-control_sm': small, 'form-control_rounded': rounded }"
       v-bind="$attrs"
-      :value.prop="value"
       v-on="listeners"
     />
     <slot name="right-icon"></slot>
@@ -23,17 +22,17 @@
 <script>
 export default {
   inheritAttrs: false,
-  name: 'AppInput',
+  name: "AppInput",
   props: {
     small: Boolean,
     rounded: Boolean,
     value: String,
     multiline: Boolean,
   },
-  model: {
-    prop: 'value',
-    event: 'input',
-  },
+  // model: {
+  //   prop: "value",
+  //   event: "input",
+  // },
   data() {
     return {
       hasIcon: false,
@@ -49,13 +48,13 @@ export default {
   },
   methods: {
     updateIcon() {
-      if (!!this.$slots['left-icon'] || !!this.$slots['right-icon']) {
+      if (!!this.$slots["left-icon"] || !!this.$slots["right-icon"]) {
         this.hasIcon = true;
       }
-      if (this.$slots['left-icon']) {
+      if (this.$slots["left-icon"]) {
         this.leftIcon = true;
       }
-      if (this.$slots['right-icon']) {
+      if (this.$slots["right-icon"]) {
         this.rightIcon = true;
       }
     },
@@ -64,12 +63,12 @@ export default {
     listeners() {
       return {
         ...this.$listeners,
-        input: ($event) => this.$emit('input', $event.target.value),
-        change: ($event) => this.$emit('change', $event.target.value),
+        input: ($event) => this.$emit("update:search", $event.target.value),
+        // change: ($event) => this.$emit("update:search", $event.target.value),
       };
     },
     formControlTag() {
-      return this.multiline ? 'textarea' : 'input';
+      return this.multiline ? "textarea" : "input";
     },
   },
 };
@@ -81,7 +80,7 @@ export default {
   height: 52px;
   border-radius: 8px;
   border: 2px solid var(--blue-light);
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   font-weight: 600;
   font-size: 20px;
   line-height: 28px;

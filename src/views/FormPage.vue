@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import FormLayout from "../components/FormLayout";
+import FormLayout from "../layout/FormLayout";
 export default {
   name: "FormPage",
   components: { FormLayout }

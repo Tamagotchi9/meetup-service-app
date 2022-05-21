@@ -7,10 +7,10 @@
 </template>
 
 <script>
-import BaseLayout from "@/components/BaseLayout";
+import BaseLayout from "@/layout/BaseLayout";
 export default {
   name: "App",
-  components: { BaseLayout }
+  components: { BaseLayout },
 };
 </script>
 

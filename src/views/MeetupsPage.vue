@@ -4,18 +4,20 @@
       <div class="filters-panel__col">
         <form-check
           :options="dateFilterOptions"
-          v-model="filter.date"
+          :date.sync="filter.date"
         ></form-check>
       </div>
 
       <div class="filters-panel__col">
         <div class="form-group form-group_inline">
-          <app-input #left-icon small rounded v-model="filter.search" value="Ke">
-            <app-icon icon="search" />
+          <app-input small rounded :search.sync="filter.search">
+            <template #left-icon>
+              <app-icon icon="search" />
+            </template>
           </app-input>
         </div>
         <div class="form-group form-group_inline">
-          <page-tabs :selected.sync="filter.view"></page-tabs>
+          <page-tabs :view.sync="filter.view"></page-tabs>
         </div>
       </div>
     </div>
@@ -32,6 +34,7 @@
       ></meetups-list>
       <meetups-calendar
         v-else-if="filter.view === 'calendar'"
+        :meetups="filteredMeetups"
         key="calendar"
       ></meetups-calendar>
     </transition>
@@ -45,7 +48,7 @@ import MeetupsCalendar from "@/components/MeetupsCalendar";
 import PageTabs from "@/components/PageTabs";
 import FormCheck from "@/components/FormCheck";
 import AppEmpty from "@/components/AppEmpty";
-import { API_URL, fetchMeetups } from "@/data";
+import { API_URL, fetchMeetups } from "@/api/meetups";
 import AppIcon from "@/components/AppIcon";
 import AppInput from "@/components/AppInput";
 
@@ -59,7 +62,7 @@ export default {
     FormCheck,
     AppEmpty,
     AppInput,
-    AppIcon
+    AppIcon,
   },
 
   data() {
@@ -69,14 +72,31 @@ export default {
         date: "",
         participation: "",
         search: "",
-        view: ""
+        view: "",
       },
       dateFilterOptions: [
         { text: "Все", value: "" },
         { text: "Прошедшие", value: "past" },
-        { text: "Ожидаемые", value: "future" }
-      ]
+        { text: "Ожидаемые", value: "future" },
+      ],
     };
+  },
+
+  watch: {
+    filter: {
+      deep: true,
+      handler() {
+        this.addQuery();
+      },
+    },
+    "$route.query": function (newQueries) {
+      this.filter.view = newQueries.view ? newQueries.view : "";
+      this.filter.date = newQueries.date ? newQueries.date : "";
+      this.filter.participation = newQueries.participation
+        ? newQueries.participation
+        : "";
+      this.filter.search = newQueries.search ? newQueries.search : "";
+    },
   },
 
   async mounted() {
@@ -85,7 +105,7 @@ export default {
 
   computed: {
     processedMeetups() {
-      return this.meetups.map(meetup => ({
+      return this.meetups.map((meetup) => ({
         ...meetup,
         cover: meetup.imageId
           ? `${API_URL}/images/${meetup.imageId}`
@@ -94,8 +114,8 @@ export default {
         localeDate: new Date(meetup.date).toLocaleString(navigator.language, {
           year: "numeric",
           month: "long",
-          day: "numeric"
-        })
+          day: "numeric",
+        }),
       }));
     },
 
@@ -104,39 +124,65 @@ export default {
 
       if (this.filter.date === "past") {
         filteredMeetups = filteredMeetups.filter(
-          meetup => new Date(meetup.date) <= new Date()
+          (meetup) => new Date(meetup.date) <= new Date()
         );
       } else if (this.filter.date === "future") {
         filteredMeetups = filteredMeetups.filter(
-          meetup => new Date(meetup.date) > new Date()
+          (meetup) => new Date(meetup.date) > new Date()
         );
       }
 
       if (this.filter.participation === "organizing") {
-        filteredMeetups = filteredMeetups.filter(meetup => meetup.organizing);
+        filteredMeetups = filteredMeetups.filter((meetup) => meetup.organizing);
       } else if (this.filter.participation === "attending") {
-        filteredMeetups = filteredMeetups.filter(meetup => meetup.attending);
+        filteredMeetups = filteredMeetups.filter((meetup) => meetup.attending);
       }
 
       if (this.filter.search) {
-        const concatMeetupText = meetup =>
+        const concatMeetupText = (meetup) =>
           [meetup.title, meetup.description, meetup.place, meetup.organizer]
             .join(" ")
             .toLowerCase();
-        filteredMeetups = filteredMeetups.filter(meetup =>
+        filteredMeetups = filteredMeetups.filter((meetup) =>
           concatMeetupText(meetup).includes(this.filter.search.toLowerCase())
         );
       }
 
       return filteredMeetups;
-    }
+    },
   },
 
   methods: {
     async fetchMeetups() {
       return fetchMeetups();
-    }
-  }
+    },
+
+    addQuery() {
+      let queries = {
+        view: this.filter.view,
+        date: this.filter.date,
+        participation: this.filter.participation,
+        search: this.filter.search,
+      };
+      if (queries.view === "list" || queries.view === "") {
+        delete queries.view;
+      }
+      if (queries.date === "all" || queries.date === "") {
+        delete queries.date;
+      }
+      if (queries.participation === "all" || queries.participation === "") {
+        delete queries.participation;
+      }
+      if (!queries.search) {
+        delete queries.search;
+      }
+      return this.$router.push({ query: queries }).catch((err) => {
+        if (err.name !== "NavigationDuplicated") {
+          throw err;
+        }
+      });
+    },
+  },
 };
 </script>
 

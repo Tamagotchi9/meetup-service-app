@@ -11,11 +11,20 @@
     </div>
     <nav>
       <router-link v-if="showReturnToMeetups" :to="{ name: 'meetups' }">
-        &larr; Вернуться к списку
+        &larr; Повернутися до списку
       </router-link>
-      <router-link :to="{ name: 'login' }">Вход</router-link>
-      <router-link to="">Регистрация</router-link>
-      <router-link :to="{ name: 'form' }">Создать митап</router-link>
+      <router-link
+        :to="{ name: 'meetups', query: { participation: 'attending' } }"
+        >Мої конференції</router-link
+      >
+      <router-link
+        :to="{ name: 'meetups', query: { participation: 'organizing' } }"
+        >Організовані конференції</router-link
+      >
+      <router-link :to="{ name: 'login' }">Вхід</router-link>
+      <router-link :to="{ name: 'register' }">Реєстрація</router-link>
+      <router-link :to="{ name: 'form' }">Створити конференцію</router-link>
+      <button>Вихід</button>
     </nav>
   </header>
 </template>
