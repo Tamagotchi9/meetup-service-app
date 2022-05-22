@@ -25,3 +25,32 @@ export async function fetchMeetups() {
 export async function fetchMeetup(id) {
   return fetch(`${API_URL}/meetups/${id}`).then((res) => res.json());
 }
+
+/**
+ * Словарь заголовков по умолчанию для всех типов элементов программы
+ */
+export const agendaItemTitles = {
+  registration: 'Регистрация',
+  opening: 'Открытие',
+  break: 'Перерыв',
+  coffee: 'Coffee Break',
+  closing: 'Закрытие',
+  afterparty: 'Afterparty',
+  talk: 'Доклад',
+  other: 'Другое',
+};
+
+/**
+ * Словарь иконок для для всех типов элементов программы.
+ * Соответствует имени иконок в директории /assets/icons
+ */
+export const agendaItemIcons = {
+  registration: 'key',
+  opening: 'cal-sm',
+  talk: 'tv',
+  break: 'clock',
+  coffee: 'coffee',
+  closing: 'key',
+  afterparty: 'cal-sm',
+  other: 'cal-sm',
+};

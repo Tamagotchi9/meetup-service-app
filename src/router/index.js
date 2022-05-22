@@ -51,20 +51,20 @@ const routes = [
       showReturnToMeetups: true,
       saveScrollPosition: true
     },
-    // component: () => import("../views/MeetupPage"),
+    component: () => import("../views/MeetupPage"),
     children: [
       {
-        path: "",
+        path: "description",
         alias: "description",
         name: "meetup-description",
         props: true,
-        // component: () => import("../views/MeetupDescriptionPage")
+        component: () => import("../components/MeetupDescription")
       },
       {
         path: "agenda",
         name: "meetup-agenda",
         props: true,
-        // component: () => import("../views/MeetupAgendaPage")
+        component: () => import("../components/MeetupAgenda")
       }
     ]
   },
