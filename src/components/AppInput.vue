@@ -12,6 +12,7 @@
       :is="formControlTag"
       class="form-control"
       :class="{ 'form-control_sm': small, 'form-control_rounded': rounded }"
+      :value="value"
       v-bind="$attrs"
       v-on="listeners"
     />
@@ -29,10 +30,10 @@ export default {
     value: String,
     multiline: Boolean,
   },
-  // model: {
-  //   prop: "value",
-  //   event: "input",
-  // },
+  model: {
+    prop: "value",
+    event: "input",
+  },
   data() {
     return {
       hasIcon: false,
@@ -63,7 +64,7 @@ export default {
     listeners() {
       return {
         ...this.$listeners,
-        input: ($event) => this.$emit("update:search", $event.target.value),
+        input: ($event) => this.$emit("input", $event.target.value),
         // change: ($event) => this.$emit("update:search", $event.target.value),
       };
     },

@@ -10,7 +10,7 @@
 
       <div class="filters-panel__col">
         <div class="form-group form-group_inline">
-          <app-input small rounded :search.sync="filter.search">
+          <app-input small rounded v-model="filter.search">
             <template #left-icon>
               <app-icon icon="search" />
             </template>
@@ -22,11 +22,7 @@
       </div>
     </div>
 
-    <transition
-      v-if="filteredMeetups && filteredMeetups.length"
-      name="fade"
-      mode="out-in"
-    >
+    <fade-transition v-if="filteredMeetups && filteredMeetups.length">
       <meetups-list
         v-if="filter.view === '' || filter.view === 'list'"
         :meetups="filteredMeetups"
@@ -37,7 +33,7 @@
         :meetups="filteredMeetups"
         key="calendar"
       ></meetups-calendar>
-    </transition>
+    </fade-transition>
     <app-empty v-else>Митапов по заданным условям не найдено...</app-empty>
   </div>
 </template>
@@ -51,6 +47,7 @@ import AppEmpty from "@/components/AppEmpty";
 import { API_URL, fetchMeetups } from "@/api/meetups";
 import AppIcon from "@/components/AppIcon";
 import AppInput from "@/components/AppInput";
+import FadeTransition from "@/components/FadeTransition";
 
 export default {
   name: "MeetupsPage",
@@ -63,6 +60,7 @@ export default {
     AppEmpty,
     AppInput,
     AppIcon,
+    FadeTransition,
   },
 
   data() {
@@ -75,9 +73,9 @@ export default {
         view: "",
       },
       dateFilterOptions: [
-        { text: "Все", value: "" },
-        { text: "Прошедшие", value: "past" },
-        { text: "Ожидаемые", value: "future" },
+        { text: "Всі", value: "" },
+        { text: "Минулі", value: "past" },
+        { text: "Майбутні", value: "future" },
       ],
     };
   },
@@ -111,11 +109,14 @@ export default {
           ? `${API_URL}/images/${meetup.imageId}`
           : undefined,
         date: new Date(meetup.date),
-        localeDate: new Date(meetup.date).toLocaleString(navigator.language, {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }),
+        localeDate: new Date(meetup.date).toLocaleString(
+          navigator.language["ukr"],
+          {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }
+        ),
       }));
     },
 

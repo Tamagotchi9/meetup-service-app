@@ -6,7 +6,7 @@
     >
       <span v-if="imageId !== null">Удалить изображение</span>
       <span v-else-if="loading">Загрузка...</span>
-      <span v-else>Загрузить изображение</span>
+      <span v-else>Завантажити фото</span>
       <input
         type="file"
         accept="image/*"

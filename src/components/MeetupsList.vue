@@ -1,17 +1,18 @@
 <template>
   <div class="meetups-list transition-list">
-    <transition-group name="transition-list">
+    <fade-transition-group>
       <meetup-list-item
         v-for="meetup in meetups"
         :meetup="meetup"
         :key="meetup.id"
       ></meetup-list-item>
-    </transition-group>
+    </fade-transition-group>
   </div>
 </template>
 
 <script>
 import MeetupListItem from "./MeetupsListItem";
+import FadeTransitionGroup from "@/components/FadeTransitionGroup";
 
 export default {
   name: "MeetupsList",
@@ -19,17 +20,16 @@ export default {
   props: {
     meetups: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
 
   components: {
-    MeetupListItem
-  }
+    MeetupListItem,
+    FadeTransitionGroup,
+  },
 };
 </script>
 
 <style scoped>
-.meetups-list {
-}
 </style>
