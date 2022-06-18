@@ -22,7 +22,14 @@
           <div class="button-list">
             <primary-button>Брати участь</primary-button>
             <secondary-button>Відмінити участь</secondary-button>
-            <router-link :to="{ name: 'create' }">
+            <router-link
+              :to="{
+                name: 'edit',
+                params: {
+                  meetup: MeetupForEdit,
+                },
+              }"
+            >
               <primary-button> Редагувати </primary-button>
             </router-link>
             <danger-button>Видалити</danger-button>
@@ -71,6 +78,12 @@ export default {
         ...this.meetup,
         cover: getMeetupCoverLink(this.meetup),
         date: new Date(this.meetup.date),
+      };
+    },
+    MeetupForEdit() {
+      return {
+        ...this.UpgradedMeetup,
+        date: this.meetup.date,
       };
     },
   },

@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="handleSubmit" class="form meetup-form">
     <div class="meetup-form__content">
-      <fieldset class="form-section">
+      <fieldset class="form-section" v-if="isCopiedMeetup">
         <form-group label="Назва">
           <app-input v-model="meetup_.title" />
         </form-group>
@@ -19,7 +19,7 @@
         </form-group>
       </fieldset>
 
-      <h3 class="form__section-title">Программа</h3>
+      <h3 class="form__section-title">Програма</h3>
       <meetup-agenda-item-form
         v-for="(agendaItem, index) in meetup_.agenda"
         :key="agendaItem.id"
@@ -31,7 +31,7 @@
 
       <div class="form-section_append">
         <button type="button" @click="addAgendaItem" data-test="addAgendaItem">
-          + Добавить этап программы
+          + Додати подію програми
         </button>
       </div>
     </div>
@@ -106,6 +106,12 @@ export default {
     return {
       meetup_: deepClone(this.meetup),
     };
+  },
+
+  computed: {
+    isCopiedMeetup() {
+      return !!Object.keys(this.meetup_).length;
+    },
   },
 
   methods: {

@@ -30,14 +30,14 @@ export async function fetchMeetup(id) {
  * Словарь заголовков по умолчанию для всех типов элементов программы
  */
 export const agendaItemTitles = {
-  registration: 'Регистрация',
-  opening: 'Открытие',
-  break: 'Перерыв',
+  registration: 'Реєстрація',
+  opening: 'Відкриття',
+  break: 'Перерва',
   coffee: 'Coffee Break',
-  closing: 'Закрытие',
+  closing: 'Закриття',
   afterparty: 'Afterparty',
-  talk: 'Доклад',
-  other: 'Другое',
+  talk: 'Виступ',
+  other: 'Інші',
 };
 
 /**

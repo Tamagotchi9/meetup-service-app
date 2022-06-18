@@ -23,8 +23,7 @@
       >
       <router-link :to="{ name: 'login' }">Вхід</router-link>
       <router-link :to="{ name: 'register' }">Реєстрація</router-link>
-      <router-link :to="{ name: 'form' }">Створити конференцію</router-link>
-      <button>Вихід</button>
+      <router-link :to="{ name: 'create' }">Створити конференцію</router-link>
     </nav>
   </header>
 </template>
@@ -32,11 +31,14 @@
 <script>
 export default {
   name: "TheHeader",
+
   computed: {
     showReturnToMeetups() {
-      return this.$route.matched.some(route => route.meta.showReturnToMeetups);
-    }
-  }
+      return this.$route.matched.some(
+        (route) => route.meta.showReturnToMeetups
+      );
+    },
+  },
 };
 </script>
 

@@ -1,15 +1,18 @@
 <template>
   <footer class="footer">
     <div class="container">
-      © 2020. learn.javascript.ru
-      <a href="https://learn.javascript.ru/courses/vue">Vue.js Course</a>
+      © 2022. Dmytro Voloshko
+      <div>
+        <a href="https://learn.javascript.ru/courses/vue">My profile</a>
+      </div>
+      <div><a href="https://learn.javascript.ru/courses/vue">Project</a></div>
     </div>
   </footer>
 </template>
 
 <script>
 export default {
-  name: 'TheFooter',
+  name: "TheFooter",
 };
 </script>
 

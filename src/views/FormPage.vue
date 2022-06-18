@@ -1,8 +1,12 @@
 <template>
-  <form-layout title="Створити конференцію">
+  <form-layout
+    :title="
+      $route.name === 'edit' ? 'Редагувати конференцію' : 'Створити конференцію'
+    "
+  >
     <meetup-form
-      :meetup="meetup"
-      submit-text="Сабмит"
+      :meetup="isEmptyMeetupFromEdit ? meetup : meetupFromCreate"
+      submit-text="Створити"
       @submit="handleSubmit"
       @cancel="handleCancel"
     />
@@ -17,9 +21,16 @@ export default {
 
   components: { FormLayout, MeetupForm },
 
+  props: {
+    meetup: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
+
   data() {
     return {
-      meetup: {
+      meetupFromCreate: {
         id: 0,
         title: "",
         description: "",
@@ -29,6 +40,12 @@ export default {
         agenda: [],
       },
     };
+  },
+
+  computed: {
+    isEmptyMeetupFromEdit() {
+      return !!Object.keys(this.meetup).length;
+    },
   },
 
   methods: {

@@ -41,7 +41,12 @@ const routes = [
   {
     path: "/meetups",
     name: "meetups",
-    component: () => import("@/views/MeetupsPage")
+    component: () => import("@/views/MeetupsPage"),
+  },
+  {
+    path: "/meetups/create",
+    name: "create",
+    component: () => import("@/views/FormPage")
   },
   {
     path: "/meetups/:meetupId(\\d+)",
@@ -65,14 +70,21 @@ const routes = [
         name: "meetup-agenda",
         props: true,
         component: () => import("../components/MeetupAgenda")
-      }
+      },
     ]
   },
   {
-    path: "/create",
-    name: "form",
-    component: () => import("@/views/FormPage")
+    path: "/meetups/:meetupId(\\d+)/edit",
+    name: "edit",
+    props: true,
+    component: () => import("@/views/FormPage"),
+  },
+  {
+    path: "*",
+    name: "not-found",
+    component: () => import("@/views/NotFoundPage"),
   }
+
 ];
 
 const router = new VueRouter({
