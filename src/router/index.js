@@ -60,7 +60,6 @@ const routes = [
     children: [
       {
         path: "description",
-        alias: "description",
         name: "meetup-description",
         props: true,
         component: () => import("../components/MeetupDescription")

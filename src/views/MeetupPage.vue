@@ -15,11 +15,21 @@ export default {
   data() {
     return {
       meetup: null,
+      serverErrors: null,
     };
   },
 
-  mounted() {
-    this.getMeetup();
+  beforeRouteEnter(to, from, next) {
+    fetchMeetup(to.params.meetupId).then((result) => {
+      next((vm) => vm.setMeetup(result.error, result));
+    });
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.meetup = null;
+    fetchMeetup(to.params.meetupId).then((result) => {
+      this.setMeetup(result.error, result);
+      next();
+    });
   },
 
   methods: {
@@ -27,6 +37,13 @@ export default {
       fetchMeetup(this.$route.params.meetupId).then((result) => {
         this.meetup = result;
       });
+    },
+    setMeetup(err, meetup) {
+      if (err) {
+        this.serverErrors = err.toString();
+      } else {
+        this.meetup = meetup;
+      }
     },
   },
 };

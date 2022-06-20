@@ -64,10 +64,12 @@ import ImageUploader from "./ImageUploader";
 import FormGroup from "./FormGroup";
 import AppInput from "./AppInput";
 import DateInput from "./DateInput";
+import { cloneDeep } from "lodash";
+import { nanoid } from "nanoid";
 
 function buildAgendaItem() {
   return {
-    id: Math.random(),
+    id: nanoid(),
     startsAt: "00:00",
     endsAt: "00:00",
     type: "other",
@@ -77,8 +79,6 @@ function buildAgendaItem() {
     language: null,
   };
 }
-
-const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
 
 export default {
   name: "MeetupForm",
@@ -104,7 +104,7 @@ export default {
 
   data() {
     return {
-      meetup_: deepClone(this.meetup),
+      meetup_: cloneDeep(this.meetup),
     };
   },
 
@@ -133,7 +133,7 @@ export default {
     },
 
     handleSubmit() {
-      this.$emit("submit", deepClone(this.meetup_));
+      this.$emit("submit", cloneDeep(this.meetup_));
     },
   },
 };
