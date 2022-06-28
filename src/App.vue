@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <app-toast ref="toaster" />
     <base-layout>
       <router-view />
     </base-layout>
@@ -8,9 +9,11 @@
 
 <script>
 import BaseLayout from "@/layout/BaseLayout";
+import AppToast from "@/components/AppToast";
 export default {
   name: "App",
-  components: { BaseLayout },
+  components: { BaseLayout, AppToast },
+
 };
 </script>
 

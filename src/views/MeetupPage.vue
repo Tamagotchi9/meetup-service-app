@@ -4,48 +4,43 @@
 
 <script>
 import MeetupView from "@/components/MeetupView";
-import { fetchMeetup } from "@/api/meetups";
+import { MeetupsAPI } from "@/api/MeetupsAPI";
 
 export default {
   name: "MeetupPage",
   components: {
-    MeetupView,
+    MeetupView
   },
 
   data() {
     return {
-      meetup: null,
-      serverErrors: null,
+      meetup: null
     };
   },
 
   beforeRouteEnter(to, from, next) {
-    fetchMeetup(to.params.meetupId).then((result) => {
-      next((vm) => vm.setMeetup(result.error, result));
+    MeetupsAPI.fetchMeetup(to.params.meetupId).then(result => {
+      next(vm => vm.setMeetup(result.error, result.data));
     });
   },
   beforeRouteUpdate(to, from, next) {
     this.meetup = null;
-    fetchMeetup(to.params.meetupId).then((result) => {
-      this.setMeetup(result.error, result);
+    MeetupsAPI.fetchMeetup(to.params.meetupId).then(result => {
+      this.setMeetup(result.error, result.data);
       next();
     });
   },
 
   methods: {
-    async getMeetup() {
-      fetchMeetup(this.$route.params.meetupId).then((result) => {
-        this.meetup = result;
-      });
-    },
     setMeetup(err, meetup) {
       if (err) {
-        this.serverErrors = err.toString();
+        this.$toaster.error(err.message);
       } else {
         this.meetup = meetup;
+        this.$toaster.success("Meetup loaded");
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -76,7 +76,7 @@ function buildAgendaItem() {
     title: null,
     description: null,
     speaker: null,
-    language: null,
+    language: null
   };
 }
 
@@ -88,38 +88,39 @@ export default {
     MeetupAgendaItemForm,
     FormGroup,
     AppInput,
-    DateInput,
+    DateInput
   },
 
   props: {
     meetup: {
       type: Object,
-      required: true,
+      required: true
     },
     submitText: {
       type: String,
-      default: "",
-    },
+      default: ""
+    }
   },
 
   data() {
     return {
-      meetup_: cloneDeep(this.meetup),
+      meetup_: cloneDeep(this.meetup)
     };
   },
 
   computed: {
     isCopiedMeetup() {
       return !!Object.keys(this.meetup_).length;
-    },
+    }
   },
 
   methods: {
     addAgendaItem() {
       const newItem = buildAgendaItem();
       if (this.meetup_.agenda.length) {
-        newItem.startsAt =
-          this.meetup_.agenda[this.meetup_.agenda.length - 1].endsAt;
+        newItem.startsAt = this.meetup_.agenda[
+          this.meetup_.agenda.length - 1
+        ].endsAt;
       }
       this.meetup_.agenda.push(newItem);
     },
@@ -134,8 +135,8 @@ export default {
 
     handleSubmit() {
       this.$emit("submit", cloneDeep(this.meetup_));
-    },
-  },
+    }
+  }
 };
 </script>
 

@@ -44,7 +44,7 @@ import MeetupsCalendar from "@/components/MeetupsCalendar";
 import PageTabs from "@/components/PageTabs";
 import FormCheck from "@/components/FormCheck";
 import AppEmpty from "@/components/AppEmpty";
-import { API_URL, fetchMeetups } from "@/api/meetups";
+import { MeetupsAPI } from "@/api/MeetupsAPI";
 import AppIcon from "@/components/AppIcon";
 import AppInput from "@/components/AppInput";
 import FadeTransition from "@/components/FadeTransition";
@@ -60,7 +60,7 @@ export default {
     AppEmpty,
     AppInput,
     AppIcon,
-    FadeTransition,
+    FadeTransition
   },
 
   data() {
@@ -70,13 +70,13 @@ export default {
         date: "",
         participation: "",
         search: "",
-        view: "",
+        view: ""
       },
       dateFilterOptions: [
         { text: "Всі", value: "" },
         { text: "Минулі", value: "past" },
-        { text: "Майбутні", value: "future" },
-      ],
+        { text: "Майбутні", value: "future" }
+      ]
     };
   },
 
@@ -85,16 +85,16 @@ export default {
       deep: true,
       handler() {
         this.addQuery();
-      },
+      }
     },
-    "$route.query": function (newQueries) {
+    "$route.query": function(newQueries) {
       this.filter.view = newQueries.view ? newQueries.view : "";
       this.filter.date = newQueries.date ? newQueries.date : "";
       this.filter.participation = newQueries.participation
         ? newQueries.participation
         : "";
       this.filter.search = newQueries.search ? newQueries.search : "";
-    },
+    }
   },
 
   async mounted() {
@@ -103,10 +103,10 @@ export default {
 
   computed: {
     processedMeetups() {
-      return this.meetups.map((meetup) => ({
+      return this.meetups.map(meetup => ({
         ...meetup,
         cover: meetup.imageId
-          ? `${API_URL}/images/${meetup.imageId}`
+          ? `${process.env.VUE_APP_API_PROXY_TARGET}/images/${meetup.imageId}`
           : undefined,
         date: new Date(meetup.date),
         localeDate: new Date(meetup.date).toLocaleString(
@@ -114,9 +114,9 @@ export default {
           {
             year: "numeric",
             month: "long",
-            day: "numeric",
+            day: "numeric"
           }
-        ),
+        )
       }));
     },
 
@@ -125,37 +125,44 @@ export default {
 
       if (this.filter.date === "past") {
         filteredMeetups = filteredMeetups.filter(
-          (meetup) => new Date(meetup.date) <= new Date()
+          meetup => new Date(meetup.date) <= new Date()
         );
       } else if (this.filter.date === "future") {
         filteredMeetups = filteredMeetups.filter(
-          (meetup) => new Date(meetup.date) > new Date()
+          meetup => new Date(meetup.date) > new Date()
         );
       }
 
       if (this.filter.participation === "organizing") {
-        filteredMeetups = filteredMeetups.filter((meetup) => meetup.organizing);
+        filteredMeetups = filteredMeetups.filter(meetup => meetup.organizing);
       } else if (this.filter.participation === "attending") {
-        filteredMeetups = filteredMeetups.filter((meetup) => meetup.attending);
+        filteredMeetups = filteredMeetups.filter(meetup => meetup.attending);
       }
 
       if (this.filter.search) {
-        const concatMeetupText = (meetup) =>
+        const concatMeetupText = meetup =>
           [meetup.title, meetup.description, meetup.place, meetup.organizer]
             .join(" ")
             .toLowerCase();
-        filteredMeetups = filteredMeetups.filter((meetup) =>
+        filteredMeetups = filteredMeetups.filter(meetup =>
           concatMeetupText(meetup).includes(this.filter.search.toLowerCase())
         );
       }
 
       return filteredMeetups;
-    },
+    }
   },
 
   methods: {
     async fetchMeetups() {
-      return fetchMeetups();
+      try {
+        const response = await MeetupsAPI.fetchMeetups();
+        console.log(this.$toaster);
+        this.$toaster.success("Meetups loaded");
+        return await response.data;
+      } catch (err) {
+        this.$toaster.error(err.message);
+      }
     },
 
     addQuery() {
@@ -163,7 +170,7 @@ export default {
         view: this.filter.view,
         date: this.filter.date,
         participation: this.filter.participation,
-        search: this.filter.search,
+        search: this.filter.search
       };
       if (queries.view === "list" || queries.view === "") {
         delete queries.view;
@@ -177,13 +184,13 @@ export default {
       if (!queries.search) {
         delete queries.search;
       }
-      return this.$router.push({ query: queries }).catch((err) => {
+      return this.$router.push({ query: queries }).catch(err => {
         if (err.name !== "NavigationDuplicated") {
           throw err;
         }
       });
-    },
-  },
+    }
+  }
 };
 </script>
 
