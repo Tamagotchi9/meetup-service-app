@@ -1,5 +1,5 @@
 <template>
-  <auth-layout title="Реєстрація">
+  <auth-layout title="Логін">
     <form class="form" @submit.prevent="signIn">
       <div class="form-group">
         <label class="form-label">Email</label>
@@ -40,7 +40,7 @@
 
 <script>
 import AuthLayout from "../layout/AuthLayout";
-import { login } from "@/api/auth";
+import { AuthAPI } from "@/api/AuthAPI";
 
 export default {
   name: "LoginPage",
@@ -53,18 +53,16 @@ export default {
   },
   methods: {
     async signIn() {
-      if (this.email === "") {
-        return alert("Требуется ввести Email");
-      } else if (this.password === "") {
-        return alert("Требуется ввести пароль");
+      try {
+        this.$progress.start();
+        const response = await AuthAPI.login(this.email, this.password);
+        console.log(response);
+         this.$progress.finish();
+      } catch (err) {
+        console.log(err);
+        this.$toaster.error(err.response.data.message);
+        this.$progress.fail();
       }
-      await login(this.email, this.password).then(obj => {
-        if (obj.fullname) {
-          return alert(obj.fullname);
-        } else {
-          return alert(obj.message);
-        }
-      });
     }
   }
 };

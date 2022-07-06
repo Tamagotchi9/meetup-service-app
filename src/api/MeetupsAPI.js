@@ -16,17 +16,12 @@ export const MeetupsAPI = {
     });
   },
   async updateMeetup(meetupId, meetup) {
-    try {
-      const request = await axios.put(
-        `${process.env.VUE_APP_API_PROXY_TARGET}/meetups/${meetupId}`,
-        {
-          meetup
-        }
-      );
-      return await request.json();
-    } catch (err) {
-      console.log(err.message);
-    }
+    return await axios.put(
+      `${process.env.VUE_APP_API_PROXY_TARGET}/meetups/${meetupId}`,
+      {
+        meetup
+      }
+    );
   },
   async deleteMeetup(meetupId) {
     try {

@@ -45,6 +45,7 @@ import PageTabs from "@/components/PageTabs";
 import FormCheck from "@/components/FormCheck";
 import AppEmpty from "@/components/AppEmpty";
 import { MeetupsAPI } from "@/api/MeetupsAPI";
+import { withProgress } from "@/helpers/requests-wrapper";
 import AppIcon from "@/components/AppIcon";
 import AppInput from "@/components/AppInput";
 import FadeTransition from "@/components/FadeTransition";
@@ -98,7 +99,9 @@ export default {
   },
 
   async mounted() {
-    this.meetups = await this.fetchMeetups();
+    if (!this.meetups.length) {
+      this.meetups = await this.fetchMeetups();
+    }
   },
 
   computed: {
@@ -156,8 +159,7 @@ export default {
   methods: {
     async fetchMeetups() {
       try {
-        const response = await MeetupsAPI.fetchMeetups();
-        console.log(this.$toaster);
+        const response = await withProgress(MeetupsAPI.fetchMeetups());
         this.$toaster.success("Meetups loaded");
         return await response.data;
       } catch (err) {

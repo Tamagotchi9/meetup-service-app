@@ -5,6 +5,7 @@
 <script>
 import MeetupView from "@/components/MeetupView";
 import { MeetupsAPI } from "@/api/MeetupsAPI";
+import { withProgress } from "@/helpers/requests-wrapper";
 
 export default {
   name: "MeetupPage",
@@ -19,13 +20,13 @@ export default {
   },
 
   beforeRouteEnter(to, from, next) {
-    MeetupsAPI.fetchMeetup(to.params.meetupId).then(result => {
+    withProgress(MeetupsAPI.fetchMeetup(to.params.meetupId)).then(result => {
       next(vm => vm.setMeetup(result.error, result.data));
     });
   },
   beforeRouteUpdate(to, from, next) {
     this.meetup = null;
-    MeetupsAPI.fetchMeetup(to.params.meetupId).then(result => {
+    withProgress(MeetupsAPI.fetchMeetup(to.params.meetupId)).then(result => {
       this.setMeetup(result.error, result.data);
       next();
     });

@@ -50,7 +50,7 @@
 
 <script>
 import AuthLayout from "../layout/AuthLayout";
-import { register } from "@/api/auth";
+import { AuthAPI } from "@/api/AuthAPI";
 
 export default {
   name: "RegisterPage",
@@ -68,26 +68,19 @@ export default {
   },
   methods: {
     async signUp() {
-      if (this.email === "") {
-        return alert("Требуется ввести Email");
-      } else if (this.fullName === "") {
-        return alert("Требуется ввести полное имя");
-      } else if (this.password === "") {
-        return alert("Требуется ввести пароль");
-      } else if (this.password !== this.passwordConfirm) {
-        return alert("Пароли не совпадают");
-      } else if (this.checked === false) {
-        return alert("Требуется согласиться с условиями");
+      try {
+        this.$progress.start();
+        const response = await AuthAPI.register({
+          email: this.email,
+          password: this.password,
+          fullname: this.fullName
+        });
+        console.log(response);
+        this.$progress.finish();
+      } catch (err) {
+        console.log(err);
+        this.$progress.fail();
       }
-      return await register(this.email, this.fullName, this.password).then(
-        obj => {
-          if (obj.id) {
-            return alert(obj.id);
-          } else {
-            return alert(obj.message);
-          }
-        }
-      );
     }
   }
 };

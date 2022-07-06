@@ -4,34 +4,38 @@ export const AuthAPI = {
   async fetchUser() {
     try {
       const request = await axios.get(`${process.env.API_URL}/auth/user`);
-      const response = await request.json();
+      const response = await request;
       return response;
     } catch (err) {
       console.log(err.message);
     }
   },
   async login(email, password) {
-    try {
-      const request = await axios.post(`${process.env.API_URL}/auth/login`, {
+    return await axios.post(
+      `${process.env.VUE_APP_API_PROXY_TARGET}/auth/login`,
+      {
         email,
-        password,
-      });
-      const response = await request.json();
-      return response;
-    } catch (err) {
-      console.log(err.message);
-    }
+        password
+      },
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
   },
   async register(user) {
-    try {
-      const request = await axios.post(`${process.env.API_URL}/auth/register`, {
-        user,
-      });
-      const response = await request.json();
-      return response;
-    } catch (err) {
-      console.log(err.message);
-    }
+    return await axios.post(
+      `${process.env.VUE_APP_API_PROXY_TARGET}/auth/register`,
+      {
+        user
+      },
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
   },
   async logout() {
     try {
@@ -41,5 +45,5 @@ export const AuthAPI = {
     } catch (err) {
       console.log(err.message);
     }
-  },
+  }
 };

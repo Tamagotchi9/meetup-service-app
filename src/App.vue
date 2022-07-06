@@ -10,10 +10,16 @@
 <script>
 import BaseLayout from "@/layout/BaseLayout";
 import AppToast from "@/components/AppToast";
+import TopProgressBar from "./plugins/TopProgressBar";
+
 export default {
   name: "App",
+
+  TopProgressBar,
+
   components: { BaseLayout, AppToast },
 
+  
 };
 </script>
 
