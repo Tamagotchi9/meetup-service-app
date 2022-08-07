@@ -24,13 +24,6 @@ export default {
       next(vm => vm.setMeetup(result.error, result.data));
     });
   },
-  beforeRouteUpdate(to, from, next) {
-    this.meetup = null;
-    withProgress(MeetupsAPI.fetchMeetup(to.params.meetupId)).then(result => {
-      this.setMeetup(result.error, result.data);
-      next();
-    });
-  },
 
   methods: {
     setMeetup(err, meetup) {

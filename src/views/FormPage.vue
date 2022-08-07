@@ -6,7 +6,7 @@
   >
     <meetup-form
       :meetup="isEmptyMeetupFromEdit ? meetup : meetupFromCreate"
-      submit-text="Створити"
+      :submit-text="$route.name === 'edit' ? 'Редагувати' : 'Створити'"
       @submit="handleSubmit"
       @cancel="handleCancel"
     />
@@ -17,6 +17,7 @@
 import FormLayout from "@/layout/FormLayout";
 import MeetupForm from "@/components/MeetupForm";
 import { MeetupsAPI } from "@/api/MeetupsAPI";
+import { withProgress } from "@/helpers/requests-wrapper";
 
 export default {
   name: "FormPage",
@@ -54,31 +55,32 @@ export default {
     async handleSubmit(meetup) {
       if (this.$route.name === "edit") {
         try {
-          this.$progress.start();
-          const response = await MeetupsAPI.updateMeetup(meetup.id, meetup);
-          this.$toaster.success("Meetup Updated");
-          this.$progress.finish();
-          return await response.data;
+          await withProgress(MeetupsAPI.updateMeetup(meetup.id, meetup));
+          this.$toaster.success("Подію оновлено");
         } catch (err) {
-          this.$progress.fail();
           this.$toaster.error(err.response.data.message);
         }
       } else {
         try {
-          this.$progress.start();
-          const response = await MeetupsAPI.createMeetup(this.meetupFromCreate);
-          this.$toaster.success("Meetup Created");
-          this.$progress.finish();
-          return await response.data;
+          console.log(meetup);
+          await withProgress(MeetupsAPI.createMeetup(meetup));
+          this.$toaster.success("Подія створена");
+          this.$router.push({ name: "meetups" });
         } catch (err) {
-          this.$progress.fail();
           this.$toaster.error(err.response.data.message);
         }
       }
     },
 
     handleCancel() {
-      alert("Cancel");
+      if (this.$route.name === "edit") {
+        this.$router.push({
+          name: "meetup",
+          params: { meetupId: this.$route.params.meetupId }
+        });
+      } else {
+        this.$router.push({ name: "meetups" });
+      }
     }
   }
 };

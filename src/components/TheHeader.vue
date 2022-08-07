@@ -14,31 +14,61 @@
         &larr; Повернутися до списку
       </router-link>
       <router-link
+        v-if="user"
         :to="{ name: 'meetups', query: { participation: 'attending' } }"
         >Мої конференції</router-link
       >
       <router-link
+        v-if="user"
         :to="{ name: 'meetups', query: { participation: 'organizing' } }"
         >Організовані конференції</router-link
       >
-      <router-link :to="{ name: 'login' }">Вхід</router-link>
-      <router-link :to="{ name: 'register' }">Реєстрація</router-link>
+      <router-link v-if="user === null" :to="{ name: 'login' }"
+        >Вхід</router-link
+      >
+      <router-link v-if="user === null" :to="{ name: 'register' }"
+        >Реєстрація</router-link
+      >
       <router-link :to="{ name: 'create' }">Створити конференцію</router-link>
+      <a v-if="user !== null" @click="logout">{{ user.fullname }} (Вихід)</a>
     </nav>
   </header>
 </template>
 
 <script>
+import { AuthAPI } from "@/api/AuthAPI";
+import { withProgress } from "@/helpers/requests-wrapper";
+import { authService } from "@/services/AuthService";
+
 export default {
   name: "TheHeader",
 
   computed: {
     showReturnToMeetups() {
-      return this.$route.matched.some(
-        (route) => route.meta.showReturnToMeetups
-      );
+      return this.$route.matched.some(route => route.meta.showReturnToMeetups);
     },
+    user: {
+      get() {
+        return authService.user;
+      },
+      set(deleteUser) {
+        authService.user = deleteUser;
+      }
+    }
   },
+
+  methods: {
+    async logout() {
+      try {
+        await withProgress(AuthAPI.logout());
+        localStorage.clear();
+        this.user = null;
+        window.location.reload();
+      } catch (err) {
+        this.$toaster.error(err.response.data.message);
+      }
+    }
+  }
 };
 </script>
 

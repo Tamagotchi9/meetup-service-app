@@ -11,46 +11,30 @@ export const MeetupsAPI = {
     );
   },
   async createMeetup(meetup) {
-    return await axios.post(`${process.env.VUE_APP_API_PROXY_TARGET}/meetups`, {
+    return await axios.post(
+      `${process.env.VUE_APP_API_PROXY_TARGET}/meetups`,
       meetup
-    });
+    );
   },
   async updateMeetup(meetupId, meetup) {
     return await axios.put(
       `${process.env.VUE_APP_API_PROXY_TARGET}/meetups/${meetupId}`,
-      {
-        meetup
-      }
+      meetup
     );
   },
   async deleteMeetup(meetupId) {
-    try {
-      const request = await axios.delete(
-        `${process.env.VUE_APP_API_PROXY_TARGET}/meetups/${meetupId}`
-      );
-      return await request.json();
-    } catch (err) {
-      console.log(err.message);
-    }
+    return await axios.delete(
+      `${process.env.VUE_APP_API_PROXY_TARGET}/meetups/${meetupId}`
+    );
   },
   async attend(meetupId) {
-    try {
-      const request = await axios.put(
-        `${process.env.VUE_APP_API_PROXY_TARGET}/meetups/${meetupId}/participation`
-      );
-      return await request.json();
-    } catch (err) {
-      console.log(err.message);
-    }
+    return await axios.put(
+      `${process.env.VUE_APP_API_PROXY_TARGET}/meetups/${meetupId}/participation`
+    );
   },
   async leave(meetupId) {
-    try {
-      const request = await axios.delete(
-        `${process.env.API_URL}/meetups/${meetupId}/participation`
-      );
-      return await request.json();
-    } catch (err) {
-      console.log(err.message);
-    }
+    return await axios.delete(
+      `${process.env.VUE_APP_API_PROXY_TARGET}/meetups/${meetupId}/participation`
+    );
   }
 };

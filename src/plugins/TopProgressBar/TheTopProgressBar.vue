@@ -3,17 +3,17 @@
     class="progress"
     :class="{
       show,
-      failed,
+      failed
     }"
     :style="{
-      width: currentProgress + '%',
+      width: currentProgress + '%'
     }"
   ></div>
 </template>
 
 <script>
 // Воспользуемся Tweenjs для плавного изменения состояния
-import { Tween, Easing, update } from './vendor/tween.esm';
+import { Tween, Easing, update } from "./vendor/tween.esm";
 
 // Сохраним константы
 const START_DELAY = 100;
@@ -22,7 +22,7 @@ const MAX_DURATION = 30000;
 const FINISH_DURATION = 200;
 
 export default {
-  name: 'TheTopProgressBar',
+  name: "TheTopProgressBar",
 
   data() {
     return {
@@ -36,7 +36,7 @@ export default {
       // id для requestAnimationFrame
       requestAnimationFrameId: null,
       // id для задержки запуска
-      startDelayTimeoutId: null,
+      startDelayTimeoutId: null
     };
   },
 
@@ -72,7 +72,7 @@ export default {
           0,
           MAX_PROGRESS,
           MAX_DURATION,
-          Easing.Exponential.Out,
+          Easing.Exponential.Out
         )
           .onComplete(() => {
             this.tweenProgress = null;
@@ -111,7 +111,7 @@ export default {
         this.currentProgress,
         100,
         FINISH_DURATION,
-        Easing.Linear.None,
+        Easing.Linear.None
       )
         .onComplete(() => {
           this.show = 0;
@@ -140,7 +140,7 @@ export default {
     fail() {
       this.failed = true;
       this.stop();
-    },
+    }
   },
 
   // Хотя для одноразового компонента, который всегда существует, утечка памяти не опасна,
@@ -150,7 +150,7 @@ export default {
     if (this.startDelayTimeoutId !== null) {
       clearTimeout(this.startDelayTimeoutId);
     }
-  },
+  }
 };
 </script>
 

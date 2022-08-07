@@ -19,46 +19,55 @@
 </template>
 
 <script>
-import { ImageService } from "@/helpers/image-service";
+import { ImageAPI } from "@/api/ImageAPI";
+import { withProgress } from "@/helpers/requests-wrapper";
 
 export default {
   name: "ImageUploader",
   data() {
     return {
-      loading: false,
+      loading: false
     };
   },
   props: {
     imageId: {
       type: Number,
-      default: null,
-    },
+      default: null
+    }
   },
   model: {
     prop: "imageId",
-    event: "change",
+    event: "change"
   },
   methods: {
     async uploadImage(file) {
-      if (this.imageId === null) {
+      try {
         this.loading = true;
+
+        const fd = new FormData();
+        fd.append("file", file, file.name);
+
+        const res = await withProgress(ImageAPI.uploadImage(fd));
+        this.$emit("change", res.data.id);
+
+        this.$toaster.success("Зображення успішно додано!");
+        this.loading = false;
+      } catch (err) {
+        this.$toaster.error(err.response.data.message);
       }
-      let result = await ImageService.uploadImage(file);
-      // this.imageId = result.id;
-      this.$emit("change", result.id);
-      this.loading = false;
     },
     getImageURL(id) {
-      return ImageService.getImageURL(id);
+      return ImageAPI.fetchImage(id);
     },
     deleteImage(e) {
       if (this.imageId !== null) {
+        console.log(e);
         e.preventDefault();
         this.$emit("change", null);
         e.target.value = "";
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

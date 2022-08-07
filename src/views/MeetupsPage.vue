@@ -160,7 +160,6 @@ export default {
     async fetchMeetups() {
       try {
         const response = await withProgress(MeetupsAPI.fetchMeetups());
-        this.$toaster.success("Meetups loaded");
         return await response.data;
       } catch (err) {
         this.$toaster.error(err.message);

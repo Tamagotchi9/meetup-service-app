@@ -51,6 +51,7 @@
 <script>
 import AuthLayout from "../layout/AuthLayout";
 import { AuthAPI } from "@/api/AuthAPI";
+import { withProgress } from "@/helpers/requests-wrapper";
 
 export default {
   name: "RegisterPage",
@@ -69,17 +70,13 @@ export default {
   methods: {
     async signUp() {
       try {
-        this.$progress.start();
-        const response = await AuthAPI.register({
-          email: this.email,
-          password: this.password,
-          fullname: this.fullName
-        });
-        console.log(response);
-        this.$progress.finish();
+        await withProgress(
+          AuthAPI.register(this.email, this.password, this.fullName)
+        );
+        this.$router.push({ name: "login" });
+        this.$toaster.success("Реєстрація виконана успішно");
       } catch (err) {
-        console.log(err);
-        this.$progress.fail();
+        this.$toaster.error(err.response.data.message);
       }
     }
   }

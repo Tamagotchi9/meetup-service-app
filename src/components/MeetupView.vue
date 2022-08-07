@@ -1,16 +1,15 @@
 <template>
   <div>
-    <!-- meetup cover -->
     <meetup-cover :link="UpgradedMeetup.cover" :title="UpgradedMeetup.title" />
     <div class="container">
       <div class="meetup">
         <div class="meetup__content">
-          <h3>Опис</h3>
-          <!-- meetup description -->
-          <meetup-description :description="UpgradedMeetup.description" />
-          <h3>Програма</h3>
-          <!-- meetup agenda -->
-          <meetup-agenda :agenda="UpgradedMeetup.agenda" />
+          <content-tabs :tabs="tabs">
+            <router-view
+              :description="UpgradedMeetup.description"
+              :agenda="UpgradedMeetup.agenda"
+            />
+          </content-tabs>
         </div>
         <div class="meetup__aside">
           <!-- meetup info -->
@@ -20,19 +19,32 @@
             :date="UpgradedMeetup.date"
           />
           <div class="button-list">
-            <primary-button>Брати участь</primary-button>
-            <secondary-button>Відмінити участь</secondary-button>
+            <primary-button
+              v-if="!attandance && user && user.fullname !== meetup.organizer"
+              @click="allowedToAttend"
+              >Брати участь</primary-button
+            >
+            <secondary-button
+              v-if="attandance && user"
+              @click="cancelParticipation(meetup.id)"
+              >Відмінити участь</secondary-button
+            >
             <router-link
+              v-if="user && meetup.organizer === user.fullname"
               :to="{
                 name: 'edit',
                 params: {
-                  meetup: MeetupForEdit,
-                },
+                  meetup: MeetupForEdit
+                }
               }"
             >
               <primary-button> Редагувати </primary-button>
             </router-link>
-            <danger-button>Видалити</danger-button>
+            <danger-button
+              @click="deleteMeetup(meetup.id)"
+              v-if="meetup.organizing && user"
+              >Видалити</danger-button
+            >
           </div>
         </div>
       </div>
@@ -42,51 +54,104 @@
 
 <script>
 import MeetupCover from "@/components/MeetupCover";
-import MeetupDescription from "@/components/MeetupDescription";
-import MeetupAgenda from "@/components/MeetupAgenda";
 import MeetupInfo from "@/components/MeetupInfo";
-import { getMeetupCoverLink } from "@/api/meetups";
+import ContentTabs from "@/components/ContentTabs";
+import { ImageAPI } from "@/api/ImageAPI";
+import { MeetupsAPI } from "@/api/MeetupsAPI";
 import PrimaryButton from "./PrimaryButton.vue";
 import DangerButton from "./DangerButton.vue";
 import SecondaryButton from "./SecondaryButton.vue";
+import { withProgress } from "@/helpers/requests-wrapper";
+import { authService } from "@/services/AuthService";
 
 export default {
   name: "MeetupView",
 
-  // components
   components: {
     MeetupCover,
-    MeetupDescription,
-    MeetupAgenda,
     MeetupInfo,
     PrimaryButton,
     DangerButton,
     SecondaryButton,
+    ContentTabs
   },
 
-  // props
+  data() {
+    return {
+      attandance: this.meetup.attending,
+      tabs: [
+        { to: { name: "meetup-description" }, text: "Опис" },
+        { to: { name: "meetup-agenda" }, text: "Програма" }
+      ]
+    };
+  },
+
   props: {
     meetup: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
 
   computed: {
     UpgradedMeetup() {
       return {
         ...this.meetup,
-        cover: getMeetupCoverLink(this.meetup),
-        date: new Date(this.meetup.date),
+        cover: ImageAPI.fetchImage(this.meetup.imageId),
+        date: new Date(this.meetup.date)
       };
     },
     MeetupForEdit() {
       return {
         ...this.UpgradedMeetup,
-        date: this.meetup.date,
+        date: this.meetup.date
       };
     },
+    user() {
+      return authService.user;
+    }
   },
+
+  methods: {
+    async participate(meetupId) {
+      try {
+        await withProgress(MeetupsAPI.attend(meetupId));
+        this.$toaster.success("Збережено");
+        this.attandance = true;
+      } catch (err) {
+        this.$toaster.error(err.response.data.message);
+      }
+    },
+    allowedToAttend() {
+      if (this.user) {
+        this.participate(this.meetup.id);
+      } else {
+        this.$router.push({ name: "login" });
+      }
+    },
+    async cancelParticipation(meetupId) {
+      try {
+        await withProgress(MeetupsAPI.leave(meetupId));
+        this.$toaster.success("Збережено");
+        this.attandance = false;
+      } catch (err) {
+        this.$toaster.error(err.response.data.message);
+      }
+    },
+    async deleteMeetup(meetupId) {
+      let isDeleted = confirm("Ви впевнені? Цю дію не можна буде скасувати");
+      if (isDeleted) {
+        try {
+          await withProgress(MeetupsAPI.deleteMeetup(meetupId));
+          this.$toaster.success("Збережено");
+          this.attandance = false;
+          this.$router.push({ name: "meetups" });
+        } catch (err) {
+          this.$toaster.error(err.response.data.message);
+        }
+      }
+    }
+  }
 };
 </script>
 
@@ -99,7 +164,7 @@ export default {
   margin-bottom: 15px;
 }
 
-.button-list a {
+.button-list a button {
   margin-bottom: 15px;
 }
 </style>

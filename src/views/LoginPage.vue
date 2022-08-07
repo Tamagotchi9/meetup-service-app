@@ -41,6 +41,8 @@
 <script>
 import AuthLayout from "../layout/AuthLayout";
 import { AuthAPI } from "@/api/AuthAPI";
+import { withProgress } from "@/helpers/requests-wrapper";
+import { authService } from "@/services/AuthService";
 
 export default {
   name: "LoginPage",
@@ -54,14 +56,15 @@ export default {
   methods: {
     async signIn() {
       try {
-        this.$progress.start();
-        const response = await AuthAPI.login(this.email, this.password);
-        console.log(response);
-         this.$progress.finish();
+        const response = await withProgress(
+          AuthAPI.login(this.email, this.password)
+        );
+        localStorage.setItem("loggedUser", JSON.stringify(response.data));
+        authService.user = response.data;
+        this.$toaster.success("Користувач авторизований");
+        this.$router.push({ name: "meetups" });
       } catch (err) {
-        console.log(err);
         this.$toaster.error(err.response.data.message);
-        this.$progress.fail();
       }
     }
   }

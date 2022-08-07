@@ -1,24 +1,13 @@
 import axios from "axios";
 
 export const ImageAPI = {
-  async fetchImage(imageId) {
-    try {
-      const request = await axios.post(
-        `${process.env.API_URL}/images/${imageId}`
-      );
-      return await request.json();
-    } catch (err) {
-      console.log(err.message);
-    }
+  fetchImage(imageId) {
+    return `${process.env.VUE_APP_API_PROXY_TARGET}/images/${imageId}`;
   },
   async uploadImage(file) {
-    try {
-      const request = await axios.post(`${process.env.API_URL}/images/upload`, {
-        file
-      });
-      return await request.json();
-    } catch (err) {
-      console.log(err.message);
-    }
+    return await axios.post(
+      `${process.env.VUE_APP_API_PROXY_TARGET}/images/upload`,
+      file
+    );
   }
 };

@@ -26,18 +26,20 @@
 </template>
 
 <script>
-import { agendaItemTitles, agendaItemIcons } from "@/api/meetups";
+import { agendaItemTitles, agendaItemIcons } from "@/helpers/meetup-service";
 export default {
   name: "MeetupAgendaItem",
-  // props
+  
   props: {
     agendaItem: {
       type: Object,
       required: true,
     },
   },
+
   agendaItemTitles,
   agendaItemIcons,
+
   computed: {
     finalAgendaItem() {
       return {

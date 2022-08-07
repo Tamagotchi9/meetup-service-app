@@ -20,6 +20,28 @@ export const getAgendaIconsMap = () => ({
   other: "cal-sm"
 });
 
+export const agendaItemTitles = {
+  registration: "Реєстрація",
+  opening: "Відкриття",
+  break: "Перерва",
+  coffee: "Coffee Break",
+  closing: "Закриття",
+  afterparty: "Afterparty",
+  talk: "Виступ",
+  other: "Інші"
+};
+
+export const agendaItemIcons = {
+  registration: "key",
+  opening: "cal-sm",
+  talk: "tv",
+  break: "clock",
+  coffee: "coffee",
+  closing: "key",
+  afterparty: "cal-sm",
+  other: "cal-sm"
+};
+
 export const getAgendaItemLanguageOptions = () => [
   { value: null, text: "Не указано" },
   { value: "RU", text: "RU" },

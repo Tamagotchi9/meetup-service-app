@@ -1,11 +1,7 @@
-import TopProgressBar from "../plugins/TopProgressBar/TheTopProgressBar";
-import Vue from "vue";
-
-const progress = new Vue(TopProgressBar);
+import progress from "../plugins/TopProgressBar/index";
 
 export async function withProgress(promise) {
   progress.start();
-
   return promise
     .catch(err => {
       progress.fail();
