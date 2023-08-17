@@ -2,11 +2,11 @@ import axios from "axios";
 
 export const AuthAPI = {
   async fetchUser() {
-    return await axios.get(`${process.env.VUE_APP_API_PROXY_TARGET}/auth/user`);
+    return await axios.get(`${process.env.VUE_APP_API_URL}/auth/user`);
   },
   async login(email, password) {
     return await axios.post(
-      `${process.env.VUE_APP_API_PROXY_TARGET}/auth/login`,
+      `${process.env.VUE_APP_API_URL}/auth/login`,
       {
         email,
         password
@@ -20,7 +20,7 @@ export const AuthAPI = {
   },
   async register(email, password, fullname) {
     return await axios.post(
-      `${process.env.VUE_APP_API_PROXY_TARGET}/auth/register`,
+      `${process.env.VUE_APP_API_URL}/auth/register`,
       {
         email,
         password,
@@ -34,8 +34,6 @@ export const AuthAPI = {
     );
   },
   async logout() {
-    return await axios.post(
-      `${process.env.VUE_APP_API_PROXY_TARGET}/auth/logout`
-    );
+    return await axios.post(`${process.env.VUE_APP_API_URL}/auth/logout`);
   }
 };
