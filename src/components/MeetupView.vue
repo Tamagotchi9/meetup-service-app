@@ -1,48 +1,44 @@
 <template>
   <div>
-    <meetup-cover :link="UpgradedMeetup.cover" :title="UpgradedMeetup.title" />
+    <meetup-cover :link="upgradedMeetup.cover" :title="upgradedMeetup.title" />
     <div class="container">
       <div class="meetup">
         <div class="meetup__content">
           <content-tabs :tabs="tabs">
             <router-view
-              :description="UpgradedMeetup.description"
-              :agenda="UpgradedMeetup.agenda"
+              :description="upgradedMeetup.description"
+              :agenda="upgradedMeetup.agenda"
             />
           </content-tabs>
         </div>
         <div class="meetup__aside">
           <!-- meetup info -->
           <meetup-info
-            :organizer="UpgradedMeetup.organizer"
-            :place="UpgradedMeetup.place"
-            :date="UpgradedMeetup.date"
+            :organizer="upgradedMeetup.organizer.name"
+            :place="upgradedMeetup.place"
+            :date="upgradedMeetup.date"
           />
           <div class="button-list">
-            <primary-button
-              v-if="!attandance && user && user.fullname !== meetup.organizer"
-              @click="allowedToAttend"
+            <primary-button v-if="canAttend" @click="allowedToAttend"
               >Брати участь</primary-button
             >
             <secondary-button
-              v-if="attandance && user"
+              v-if="canLeave"
               @click="cancelParticipation(meetup.id)"
               >Відмінити участь</secondary-button
             >
             <router-link
-              v-if="user && meetup.organizer === user.fullname"
+              v-if="canEdit"
               :to="{
                 name: 'edit',
                 params: {
-                  meetup: MeetupForEdit
+                  editedMeetup: meetupForEdit
                 }
               }"
             >
               <primary-button> Редагувати </primary-button>
             </router-link>
-            <danger-button
-              @click="deleteMeetup(meetup.id)"
-              v-if="meetup.organizing && user"
+            <danger-button v-if="canEdit" @click="deleteMeetup(meetup.id)"
               >Видалити</danger-button
             >
           </div>
@@ -56,8 +52,6 @@
 import MeetupCover from "@/components/MeetupCover";
 import MeetupInfo from "@/components/MeetupInfo";
 import ContentTabs from "@/components/ContentTabs";
-import { ImageAPI } from "@/api/ImageAPI";
-import { MeetupsAPI } from "@/api/MeetupsAPI";
 import PrimaryButton from "./PrimaryButton.vue";
 import DangerButton from "./DangerButton.vue";
 import SecondaryButton from "./SecondaryButton.vue";
@@ -78,7 +72,6 @@ export default {
 
   data() {
     return {
-      attandance: this.meetup.attending,
       tabs: [
         { to: { name: "meetup-description" }, text: "Опис" },
         { to: { name: "meetup-agenda" }, text: "Програма" }
@@ -94,32 +87,74 @@ export default {
   },
 
   computed: {
-    UpgradedMeetup() {
+    upgradedMeetup() {
       return {
         ...this.meetup,
-        cover: ImageAPI.fetchImage(this.meetup.imageId),
+        cover: this.meetup.imageId,
         date: new Date(this.meetup.date)
       };
     },
-    MeetupForEdit() {
+    meetupForEdit() {
       return {
-        ...this.UpgradedMeetup,
+        ...this.upgradedMeetup,
         date: this.meetup.date
       };
     },
     user() {
       return authService.user;
+    },
+    isOrganizer() {
+      if (!this.user) {
+        return;
+      }
+      return this.meetup.organizer.id === this.user.uid;
+    },
+    canAttend() {
+      if (!this.user) {
+        console.log(123);
+        return true;
+      }
+      console.log(
+        !this.meetup.participants.find(
+          participantId => participantId !== this.user.uid
+        )
+      );
+      return (
+        !this.meetup.participants.find(
+          participantId => participantId !== this.user.uid
+        ) && !this.isOrganizer
+      );
+    },
+    canLeave() {
+      if (!this.user) {
+        return;
+      }
+      return (
+        this.meetup.participants.find(
+          participantId => participantId === this.user.uid
+        ) && !this.isOrganizer
+      );
+    },
+    canEdit() {
+      if (!this.user) {
+        return;
+      }
+      return this.meetup.organizer.id === this.user.uid;
     }
   },
 
   methods: {
     async participate(meetupId) {
       try {
-        await withProgress(MeetupsAPI.attend(meetupId));
-        this.$toaster.success("Збережено");
-        this.attandance = true;
+        await withProgress(
+          this.$firebase.put("meetups", meetupId, {
+            ...this.meetup,
+            participants: [...this.meetup.participants, this.user.uid]
+          })
+        );
+        this.$toaster.success("Ви будете брати участь!");
       } catch (err) {
-        this.$toaster.error(err.response.data.message);
+        this.$toaster.error(err.message);
       }
     },
     allowedToAttend() {
@@ -131,24 +166,28 @@ export default {
     },
     async cancelParticipation(meetupId) {
       try {
-        await withProgress(MeetupsAPI.leave(meetupId));
-        this.$toaster.success("Збережено");
-        this.attandance = false;
+        await withProgress(
+          this.$firebase.put("meetups", meetupId, {
+            ...this.meetup,
+            participants: this.meetup.participants.filter(
+              participantId => participantId !== this.user.uid
+            )
+          })
+        );
+        this.$toaster.success("Ви відмінили участь!");
       } catch (err) {
-        this.$toaster.error(err.response.data.message);
+        this.$toaster.error(err.message);
       }
     },
     async deleteMeetup(meetupId) {
-      let isDeleted = confirm("Ви впевнені? Цю дію не можна буде скасувати");
-      if (isDeleted) {
-        try {
-          await withProgress(MeetupsAPI.deleteMeetup(meetupId));
-          this.$toaster.success("Збережено");
-          this.attandance = false;
-          this.$router.push({ name: "meetups" });
-        } catch (err) {
-          this.$toaster.error(err.response.data.message);
-        }
+      // TODO: add confirm modal in future
+      // let isDeleted = confirm("Ви впевнені? Цю дію не можна буде скасувати");
+      try {
+        await withProgress(this.$firebase.delete("meetups", meetupId));
+        this.$toaster.success("Подію видалено");
+        this.$router.push({ name: "meetups" });
+      } catch (err) {
+        this.$toaster.error(err.message);
       }
     }
   }

@@ -21,14 +21,12 @@ export function scrollBehavior(to, from, savedPosition) {
   }
 }
 
-
-
 const routes = [
   {
     path: "/",
     name: "index",
     alias: "/meetups",
-    redirect: { name: "meetups" },
+    redirect: { name: "meetups" }
     // component: () => import("@/views/MeetupsPage")
   },
   {
@@ -44,7 +42,7 @@ const routes = [
   {
     path: "/meetups",
     name: "meetups",
-    component: () => import("@/views/MeetupsPage"),
+    component: () => import("@/views/MeetupsPage")
   },
   {
     path: "/meetups/create",
@@ -55,7 +53,7 @@ const routes = [
     }
   },
   {
-    path: "/meetups/:meetupId(\\d+)",
+    path: "/meetups/:meetupId",
     name: "meetup",
     redirect: to => ({ name: "meetup-description", params: to.params }),
     meta: {
@@ -75,7 +73,7 @@ const routes = [
         name: "meetup-agenda",
         props: true,
         component: () => import("../components/MeetupAgenda")
-      },
+      }
     ]
   },
   {
@@ -90,9 +88,8 @@ const routes = [
   {
     path: "*",
     name: "not-found",
-    component: () => import("@/views/NotFoundPage"),
+    component: () => import("@/views/NotFoundPage")
   }
-
 ];
 
 const router = new VueRouter({

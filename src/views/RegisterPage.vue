@@ -4,19 +4,23 @@
       <div class="form-group">
         <label class="form-label">Email</label>
         <div class="input-group">
-          <input type="email" class="form-control" v-model="email" />
+          <input type="email" class="form-control" v-model="dataForm.email" />
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Ім'я</label>
         <div class="input-group">
-          <input type="text" class="form-control" v-model="fullName" />
+          <input type="text" class="form-control" v-model="dataForm.name" />
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Пароль</label>
         <div class="input-group">
-          <input type="password" class="form-control" v-model="password" />
+          <input
+            type="password"
+            class="form-control"
+            v-model="dataForm.password"
+          />
         </div>
       </div>
       <div class="form-group">
@@ -50,8 +54,8 @@
 
 <script>
 import AuthLayout from "../layout/AuthLayout";
-import { AuthAPI } from "@/api/AuthAPI";
 import { withProgress } from "@/helpers/requests-wrapper";
+import { register } from "@/api/auth";
 
 export default {
   name: "RegisterPage",
@@ -60,9 +64,11 @@ export default {
   },
   data() {
     return {
-      email: "",
-      fullName: "",
-      password: "",
+      dataForm: {
+        email: "",
+        name: "",
+        password: ""
+      },
       passwordConfirm: "",
       checked: false
     };
@@ -70,13 +76,14 @@ export default {
   methods: {
     async signUp() {
       try {
-        await withProgress(
-          AuthAPI.register(this.email, this.password, this.fullName)
-        );
-        this.$router.push({ name: "login" });
+        if (!this.checked) {
+          return;
+        }
+        await withProgress(register(this.dataForm));
+        this.$router.push({ name: "meetups" });
         this.$toaster.success("Реєстрація виконана успішно");
       } catch (err) {
-        this.$toaster.error(err.response.data.message);
+        this.$toaster.error(err.message);
       }
     }
   }

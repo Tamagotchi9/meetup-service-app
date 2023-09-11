@@ -1,35 +1,39 @@
-/** URL адрес API */
-export const API_URL = "https://course-vue.javascript.ru/api";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile
+} from "firebase/auth";
+import { authService } from "@/services/AuthService";
 
-/**
- * Выполняет авторизацию по логину и паролю и возвращает результат
- * @param {string} email - email пользователя
- * @param {string} password - пароль пользователя
- * @return {Promise} - объект с данными пользователя
- */
-export async function login(email, password) {
-  return fetch(`${process.env.API_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ email, password })
-  }).then(res => res.json());
-}
+const auth = getAuth();
 
-/**
- * Выполняет авторизацию по логину и паролю и возвращает результат
- * @param {string} email - email пользователя
- * @param {string} fullname - полное имя пользователя
- * @param {string} password - пароль пользователя
- * @return {Promise} - объект с данными зарегистрированного пользователя
- */
-export async function register(email, fullname, password) {
-  return fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ email, fullname, password })
-  }).then(res => res.json());
-}
+export const register = async ({ email, password, name }) => {
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(auth.currentUser, {
+      displayName: name
+    });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+export const login = async ({ email, password }) => {
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+export const authObserver = () => {
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      authService.user = user;
+    } else {
+      authService.user = null;
+    }
+  });
+};

@@ -5,27 +5,17 @@ import "./assets/styles/index.css";
 import router from "./router";
 import ToasterPlugin from "@/plugins/ToasterPlugin";
 import TopProgressBarPlugin from "@/plugins/TopProgressBar/plugin";
-import { AuthAPI } from "@/api/AuthAPI";
-import { authService } from "@/services/AuthService";
+import Firebase from "@/plugins/firebase";
+import { authObserver } from "@/api/auth";
 
 Vue.use(TopProgressBarPlugin, { router });
 
 Vue.use(ToasterPlugin);
+Vue.use(Firebase);
 Vue.config.productionTip = false;
 
-const user = localStorage.getItem("loggedUser");
-
-if (user) {
-  AuthAPI.fetchUser()
-    .then(user => {
-      localStorage.setItem("loggedUser", JSON.stringify(user.data));
-      authService.user = user.data;
-    })
-    .catch(() => {
-      localStorage.clear();
-      authService.user = null;
-    });
-}
+// TODO: think of other places to place it
+authObserver();
 
 new Vue({
   router,

@@ -44,11 +44,12 @@ import MeetupsCalendar from "@/components/MeetupsCalendar";
 import PageTabs from "@/components/PageTabs";
 import FormCheck from "@/components/FormCheck";
 import AppEmpty from "@/components/AppEmpty";
-import { MeetupsAPI } from "@/api/MeetupsAPI";
+// import { MeetupsAPI } from "@/api/MeetupsAPI";
 import { withProgress } from "@/helpers/requests-wrapper";
 import AppIcon from "@/components/AppIcon";
 import AppInput from "@/components/AppInput";
 import FadeTransition from "@/components/FadeTransition";
+import { download } from "@/plugins/firebase";
 
 export default {
   name: "MeetupsPage",
@@ -106,20 +107,18 @@ export default {
 
   computed: {
     processedMeetups() {
+      if (!this.meetups.length) {
+        return;
+      }
       return this.meetups.map(meetup => ({
         ...meetup,
-        cover: meetup.imageId
-          ? `${process.env.VUE_APP_API_PROXY_TARGET}/images/${meetup.imageId}`
-          : undefined,
+        cover: meetup.imageId ? meetup.imageId : undefined,
         date: new Date(meetup.date),
-        localeDate: new Date(meetup.date).toLocaleString(
-          navigator.language["ukr"],
-          {
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-          }
-        )
+        localeDate: new Date(meetup.date).toLocaleString("uk", {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        })
       }));
     },
 
@@ -158,9 +157,9 @@ export default {
 
   methods: {
     async fetchMeetups() {
+      // TODO: firebase
       try {
-        const response = await withProgress(MeetupsAPI.fetchMeetups());
-        return await response.data;
+        return await withProgress(this.$firebase.get("meetups"));
       } catch (err) {
         this.$toaster.error(err.message);
       }
@@ -190,6 +189,10 @@ export default {
           throw err;
         }
       });
+    },
+
+    async getImageURL(filename) {
+      return await download(filename);
     }
   }
 };

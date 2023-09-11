@@ -30,15 +30,17 @@
         >Реєстрація</router-link
       >
       <router-link :to="{ name: 'create' }">Створити конференцію</router-link>
-      <a v-if="user !== null" @click="logout">{{ user.fullname }} (Вихід)</a>
+      <a v-if="user !== null" @click="signOut"
+        >{{ user.displayName }} (Вихід)</a
+      >
     </nav>
   </header>
 </template>
 
 <script>
-import { AuthAPI } from "@/api/AuthAPI";
 import { withProgress } from "@/helpers/requests-wrapper";
 import { authService } from "@/services/AuthService";
+import { logout } from "@/plugins/firebase";
 
 export default {
   name: "TheHeader",
@@ -47,25 +49,20 @@ export default {
     showReturnToMeetups() {
       return this.$route.matched.some(route => route.meta.showReturnToMeetups);
     },
-    user: {
-      get() {
-        return authService.user;
-      },
-      set(deleteUser) {
-        authService.user = deleteUser;
-      }
+    user() {
+      return authService.user;
     }
   },
 
   methods: {
-    async logout() {
+    async signOut() {
       try {
-        await withProgress(AuthAPI.logout());
-        localStorage.clear();
-        this.user = null;
-        window.location.reload();
+        await withProgress(logout());
+        this.$router.push({ name: "login" });
+        // localStorage.clear();
+        // window.location.reload();
       } catch (err) {
-        this.$toaster.error(err.response.data.message);
+        this.$toaster.error(err.message);
       }
     }
   }

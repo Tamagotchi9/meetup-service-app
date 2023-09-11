@@ -8,7 +8,7 @@
             type="email"
             placeholder="demo@email"
             class="form-control"
-            v-model="email"
+            v-model="dataForm.email"
           />
         </div>
       </div>
@@ -19,7 +19,7 @@
             type="password"
             placeholder="password"
             class="form-control"
-            v-model="password"
+            v-model="dataForm.password"
           />
         </div>
       </div>
@@ -40,31 +40,28 @@
 
 <script>
 import AuthLayout from "../layout/AuthLayout";
-import { AuthAPI } from "@/api/AuthAPI";
 import { withProgress } from "@/helpers/requests-wrapper";
-import { authService } from "@/services/AuthService";
+import { login } from "@/api/auth";
 
 export default {
   name: "LoginPage",
   components: { AuthLayout },
   data() {
     return {
-      email: "",
-      password: ""
+      dataForm: {
+        email: "",
+        password: ""
+      }
     };
   },
   methods: {
     async signIn() {
       try {
-        const response = await withProgress(
-          AuthAPI.login(this.email, this.password)
-        );
-        localStorage.setItem("loggedUser", JSON.stringify(response.data));
-        authService.user = response.data;
+        await withProgress(login(this.dataForm));
         this.$toaster.success("Користувач авторизований");
         this.$router.push({ name: "meetups" });
       } catch (err) {
-        this.$toaster.error(err.response.data.message);
+        this.$toaster.error(err.message);
       }
     }
   }

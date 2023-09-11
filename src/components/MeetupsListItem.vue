@@ -14,17 +14,15 @@
     <div class="meetups-list__col">
       <div class="meetups-list__description">
         <span
-          v-if="meetup.attending"
+          v-if="isInvited"
           class="meetups-list__badge meetups-list__badge_success"
           >Участвую</span
         >
-        <span v-if="meetup.organizing" class="meetups-list__badge"
-          >Организую</span
-        >
+        <span v-if="isOrganizer" class="meetups-list__badge">Организую</span>
         <ul class="info-list">
           <li>
             <app-icon icon="user" class="info-list__icon" />
-            {{ meetup.organizer }}
+            {{ meetup.organizer.name }}
           </li>
           <li>
             <app-icon icon="map" class="info-list__icon" />
@@ -42,6 +40,8 @@
 
 <script>
 import AppIcon from "./AppIcon";
+import { authService } from "@/services/AuthService";
+
 export default {
   name: "MeetupsListItem",
   components: { AppIcon },
@@ -49,6 +49,25 @@ export default {
     meetup: {
       required: true,
       type: Object
+    }
+  },
+  computed: {
+    user() {
+      return authService.user;
+    },
+    isOrganizer() {
+      if (!this.user) {
+        return false;
+      }
+      return this.meetup.organizer.id === this.user.uid;
+    },
+    isInvited() {
+      if (!this.user) {
+        return false;
+      }
+      return this.meetup.participants.find(
+        participantId => participantId === this.user.uid
+      );
     }
   }
 };

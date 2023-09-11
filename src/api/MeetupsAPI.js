@@ -1,5 +1,4 @@
 import axios from "axios";
-// import AppToast from '@/components/AppToast';
 
 export const MeetupsAPI = {
   async fetchMeetups() {

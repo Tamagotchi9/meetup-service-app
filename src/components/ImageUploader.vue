@@ -2,7 +2,7 @@
   <div class="image-uploader">
     <label
       class="image-uploader__preview image-uploader__preview-loading"
-      :style="imageId ? { '--bg-image': `url(${getImageURL(imageId)})` } : ''"
+      :style="imageUploaderBackground"
     >
       <span v-if="imageId !== null">Удалить изображение</span>
       <span v-else-if="loading">Загрузка...</span>
@@ -19,7 +19,8 @@
 </template>
 
 <script>
-import { ImageAPI } from "@/api/ImageAPI";
+// import { ImageAPI } from "@/api/ImageAPI";
+import { upload, download } from "@/plugins/firebase";
 import { withProgress } from "@/helpers/requests-wrapper";
 
 export default {
@@ -29,9 +30,14 @@ export default {
       loading: false
     };
   },
+  computed: {
+    imageUploaderBackground() {
+      return this.imageId ? { "--bg-image": `url(${this.imageId})` } : "";
+    }
+  },
   props: {
     imageId: {
-      type: Number,
+      type: String,
       default: null
     }
   },
@@ -39,25 +45,28 @@ export default {
     prop: "imageId",
     event: "change"
   },
+  watch: {
+    imageId(val) {
+      this.getImageURL(val);
+    }
+  },
   methods: {
     async uploadImage(file) {
       try {
         this.loading = true;
 
-        const fd = new FormData();
-        fd.append("file", file, file.name);
-
-        const res = await withProgress(ImageAPI.uploadImage(fd));
-        this.$emit("change", res.data.id);
+        await withProgress(upload(file));
+        const imgUrl = await this.getImageURL(file.name);
+        this.$emit("change", imgUrl);
 
         this.$toaster.success("Зображення успішно додано!");
         this.loading = false;
       } catch (err) {
-        this.$toaster.error(err.response.data.message);
+        this.$toaster.error(err.message);
       }
     },
-    getImageURL(id) {
-      return ImageAPI.fetchImage(id);
+    async getImageURL(filename) {
+      return await download(filename);
     },
     deleteImage(e) {
       if (this.imageId !== null) {
