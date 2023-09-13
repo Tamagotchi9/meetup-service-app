@@ -5,7 +5,7 @@
 <script>
 import MeetupView from "@/components/MeetupView";
 import { withProgress } from "@/helpers/requests-wrapper";
-import { getMeetup } from "@/plugins/firebase";
+import { fetchMeetup } from "@/api/MeetupsAPI";
 
 export default {
   name: "MeetupPage",
@@ -20,7 +20,7 @@ export default {
   },
 
   beforeRouteEnter(to, from, next) {
-    withProgress(getMeetup("meetups", to.params.meetupId)).then(result => {
+    withProgress(fetchMeetup(to.params.meetupId)).then(result => {
       // TODO: check if result is instance of Error
       next(vm => vm.setMeetup(null, result));
     });

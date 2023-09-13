@@ -1,36 +1,41 @@
-import axios from "axios";
+import { get, post, put, deleteEntity } from "@/plugins/firebase";
 
-export const MeetupsAPI = {
-  async fetchMeetups() {
-    return await axios.get(`${process.env.VUE_APP_API_URL}/meetups`);
-  },
-  async fetchMeetup(meetupId) {
-    return await axios.get(
-      `${process.env.VUE_APP_API_URL}/meetups/${meetupId}`
-    );
-  },
-  async createMeetup(meetup) {
-    return await axios.post(`${process.env.VUE_APP_API_URL}/meetups`, meetup);
-  },
-  async updateMeetup(meetupId, meetup) {
-    return await axios.put(
-      `${process.env.VUE_APP_API_URL}/meetups/${meetupId}`,
-      meetup
-    );
-  },
-  async deleteMeetup(meetupId) {
-    return await axios.delete(
-      `${process.env.VUE_APP_API_URL}/meetups/${meetupId}`
-    );
-  },
-  async attend(meetupId) {
-    return await axios.put(
-      `${process.env.VUE_APP_API_URL}/meetups/${meetupId}/participation`
-    );
-  },
-  async leave(meetupId) {
-    return await axios.delete(
-      `${process.env.VUE_APP_API_URL}/meetups/${meetupId}/participation`
-    );
+export const fetchMeetups = async () => {
+  try {
+    return await get("meetups");
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const fetchMeetup = async meetupId => {
+  try {
+    return await get("meetups", meetupId);
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const createMeetup = async meetup => {
+  try {
+    return await post("meetups", meetup.id, meetup);
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const updateMeetup = async meetup => {
+  try {
+    return await put("meetups", meetup.id, meetup);
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const deleteMeetup = async meetupId => {
+  try {
+    return await deleteEntity("meetups", meetupId);
+  } catch (e) {
+    throw new Error(e);
   }
 };

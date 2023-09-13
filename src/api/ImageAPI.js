@@ -1,13 +1,17 @@
-import axios from "axios";
+import { upload, download } from "@/plugins/firebase";
 
-export const ImageAPI = {
-  fetchImage(imageId) {
-    return `${process.env.VUE_APP_API_URL}/images/${imageId}`;
-  },
-  async uploadImage(file) {
-    return await axios.post(
-      `${process.env.VUE_APP_API_URL}/images/upload`,
-      file
-    );
+export const fetchImage = async (fileName, folderName) => {
+  try {
+    return await download(fileName, folderName);
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const uploadImage = async (file, folderName) => {
+  try {
+    await upload(file, folderName);
+  } catch (e) {
+    throw new Error(e);
   }
 };

@@ -44,7 +44,7 @@ import MeetupsCalendar from "@/components/MeetupsCalendar";
 import PageTabs from "@/components/PageTabs";
 import FormCheck from "@/components/FormCheck";
 import AppEmpty from "@/components/AppEmpty";
-// import { MeetupsAPI } from "@/api/MeetupsAPI";
+import { fetchMeetups } from "@/api/MeetupsAPI";
 import { withProgress } from "@/helpers/requests-wrapper";
 import AppIcon from "@/components/AppIcon";
 import AppInput from "@/components/AppInput";
@@ -101,7 +101,7 @@ export default {
 
   async mounted() {
     if (!this.meetups.length) {
-      this.meetups = await this.fetchMeetups();
+      await this.getMeetups();
     }
   },
 
@@ -156,10 +156,9 @@ export default {
   },
 
   methods: {
-    async fetchMeetups() {
-      // TODO: firebase
+    async getMeetups() {
       try {
-        return await withProgress(this.$firebase.get("meetups"));
+        this.meetups = await withProgress(fetchMeetups());
       } catch (err) {
         this.$toaster.error(err.message);
       }

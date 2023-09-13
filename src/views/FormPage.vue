@@ -19,6 +19,7 @@ import MeetupForm from "@/components/MeetupForm";
 import { withProgress } from "@/helpers/requests-wrapper";
 import { nanoid } from "nanoid";
 import { authService } from "@/services/AuthService";
+import { createMeetup, updateMeetup } from "@/api/MeetupsAPI";
 
 export default {
   name: "FormPage",
@@ -59,47 +60,44 @@ export default {
 
   methods: {
     async handleSubmit(meetup) {
-      // NEW
       try {
         this.loading = true;
-        await withProgress(
-          this.$firebase.post("meetups", meetup.id, {
-            ...meetup,
-            organizer: {
-              id: this.user.uid,
-              name: this.user.displayName,
-              email: this.user.email,
-              phone: this.user.phoneNumber,
-              photo: this.user.photoURL
-            }
-          })
-        );
+        if (this.$route.name === "edit") {
+          await withProgress(
+            updateMeetup({
+              ...meetup,
+              organizer: {
+                id: this.user.uid,
+                name: this.user.displayName,
+                email: this.user.email,
+                phone: this.user.phoneNumber,
+                photo: this.user.photoURL
+              }
+            })
+          );
+          this.$toaster.success("Подія оновлена");
+        } else {
+          await withProgress(
+            createMeetup({
+              ...meetup,
+              organizer: {
+                id: this.user.uid,
+                name: this.user.displayName,
+                email: this.user.email,
+                phone: this.user.phoneNumber,
+                photo: this.user.photoURL
+              }
+            })
+          );
+          this.$toaster.success("Подія створена");
+        }
+
         this.$router.push({ name: "meetups" });
-        this.$toaster.success("Подія створена");
       } catch (err) {
         this.$toaster.error(err.message);
       } finally {
         this.loading = false;
       }
-
-      // OLD
-      // if (this.$route.name === "edit") {
-      //   try {
-      //     await withProgress(MeetupsAPI.updateMeetup(meetup.id, meetup));
-      //     this.$toaster.success("Подію оновлено");
-      //   } catch (err) {
-      //     this.$toaster.error(err.response.data.message);
-      //   }
-      // } else {
-      //   try {
-      //     console.log(meetup);
-      //     await withProgress(MeetupsAPI.createMeetup(meetup));
-      //     this.$toaster.success("Подія створена");
-      //     this.$router.push({ name: "meetups" });
-      //   } catch (err) {
-      //     this.$toaster.error(err.response.data.message);
-      //   }
-      // }
     },
 
     handleCancel() {

@@ -19,8 +19,7 @@
 </template>
 
 <script>
-// import { ImageAPI } from "@/api/ImageAPI";
-import { upload, download } from "@/plugins/firebase";
+import { fetchImage, uploadImage } from "@/api/ImageAPI";
 import { withProgress } from "@/helpers/requests-wrapper";
 
 export default {
@@ -55,7 +54,7 @@ export default {
       try {
         this.loading = true;
 
-        await withProgress(upload(file));
+        await withProgress(uploadImage(file));
         const imgUrl = await this.getImageURL(file.name);
         this.$emit("change", imgUrl);
 
@@ -66,7 +65,7 @@ export default {
       }
     },
     async getImageURL(filename) {
-      return await download(filename);
+      return await fetchImage(filename);
     },
     deleteImage(e) {
       if (this.imageId !== null) {

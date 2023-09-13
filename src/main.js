@@ -5,13 +5,11 @@ import "./assets/styles/index.css";
 import router from "./router";
 import ToasterPlugin from "@/plugins/ToasterPlugin";
 import TopProgressBarPlugin from "@/plugins/TopProgressBar/plugin";
-import Firebase from "@/plugins/firebase";
 import { authObserver } from "@/api/auth";
 
 Vue.use(TopProgressBarPlugin, { router });
 
 Vue.use(ToasterPlugin);
-Vue.use(Firebase);
 Vue.config.productionTip = false;
 
 // TODO: think of other places to place it

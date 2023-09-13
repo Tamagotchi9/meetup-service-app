@@ -19,12 +19,10 @@
             :date="upgradedMeetup.date"
           />
           <div class="button-list">
-            <primary-button v-if="canAttend" @click="allowedToAttend"
+            <primary-button v-if="canAttend" @click="handleAttendance"
               >Брати участь</primary-button
             >
-            <secondary-button
-              v-if="canLeave"
-              @click="cancelParticipation(meetup.id)"
+            <secondary-button v-if="canLeave" @click="cancelParticipation"
               >Відмінити участь</secondary-button
             >
             <router-link
@@ -57,6 +55,7 @@ import DangerButton from "./DangerButton.vue";
 import SecondaryButton from "./SecondaryButton.vue";
 import { withProgress } from "@/helpers/requests-wrapper";
 import { authService } from "@/services/AuthService";
+import { updateMeetup, deleteMeetup } from "@/api/MeetupsAPI";
 
 export default {
   name: "MeetupView",
@@ -111,17 +110,11 @@ export default {
     },
     canAttend() {
       if (!this.user) {
-        console.log(123);
         return true;
       }
-      console.log(
-        !this.meetup.participants.find(
-          participantId => participantId !== this.user.uid
-        )
-      );
       return (
         !this.meetup.participants.find(
-          participantId => participantId !== this.user.uid
+          participantId => participantId === this.user.uid
         ) && !this.isOrganizer
       );
     },
@@ -144,10 +137,10 @@ export default {
   },
 
   methods: {
-    async participate(meetupId) {
+    async participate() {
       try {
         await withProgress(
-          this.$firebase.put("meetups", meetupId, {
+          updateMeetup({
             ...this.meetup,
             participants: [...this.meetup.participants, this.user.uid]
           })
@@ -157,17 +150,17 @@ export default {
         this.$toaster.error(err.message);
       }
     },
-    allowedToAttend() {
+    handleAttendance() {
       if (this.user) {
-        this.participate(this.meetup.id);
+        this.participate();
       } else {
         this.$router.push({ name: "login" });
       }
     },
-    async cancelParticipation(meetupId) {
+    async cancelParticipation() {
       try {
         await withProgress(
-          this.$firebase.put("meetups", meetupId, {
+          updateMeetup({
             ...this.meetup,
             participants: this.meetup.participants.filter(
               participantId => participantId !== this.user.uid
@@ -183,7 +176,7 @@ export default {
       // TODO: add confirm modal in future
       // let isDeleted = confirm("Ви впевнені? Цю дію не можна буде скасувати");
       try {
-        await withProgress(this.$firebase.delete("meetups", meetupId));
+        await withProgress(deleteMeetup(meetupId));
         this.$toaster.success("Подію видалено");
         this.$router.push({ name: "meetups" });
       } catch (err) {

@@ -96,61 +96,56 @@ export const getMeetup = async (dbCollection, documentId) => {
   }
 };
 
-const Firebase = {
-  install(Vue) {
-    Vue.prototype.$firebase = {
-      async get(dbCollection, documentId) {
-        try {
-          if (documentId) {
-            const docRef = doc(db, dbCollection, documentId);
-            const docSnap = await getDoc(docRef);
+export const get = async (dbCollection, documentId) => {
+  try {
+    if (documentId) {
+      const docRef = doc(db, dbCollection, documentId);
+      const docSnap = await getDoc(docRef);
 
-            if (docSnap.exists()) {
-              return docSnap.data();
-            } else {
-              return new Error("No such document");
-            }
-          }
-          const requestQueries = query(collection(db, dbCollection), limit(10));
-          const querySnapshot = await getDocs(requestQueries);
-
-          const data = [];
-
-          if (!querySnapshot.size) {
-            return new Error("No such data");
-          }
-
-          querySnapshot.forEach(doc => data.push(doc.data()));
-
-          return data;
-        } catch (e) {
-          throw new Error(e);
-        }
-      },
-      async post(dbCollection, documentId, payload) {
-        try {
-          const dataRef = collection(db, dbCollection);
-          await setDoc(doc(dataRef, documentId), payload);
-        } catch (e) {
-          throw new Error(e);
-        }
-      },
-      async put(dbCollection, documentId, payload) {
-        try {
-          await updateDoc(doc(db, dbCollection, documentId), payload);
-        } catch (e) {
-          throw new Error(e);
-        }
-      },
-      async delete(dbCollection, documentId) {
-        try {
-          await deleteDoc(doc(db, dbCollection, documentId));
-        } catch (e) {
-          throw new Error(e);
-        }
+      if (docSnap.exists()) {
+        return docSnap.data();
+      } else {
+        return new Error("No such document");
       }
-    };
+    }
+    const requestQueries = query(collection(db, dbCollection), limit(10));
+    const querySnapshot = await getDocs(requestQueries);
+
+    const data = [];
+
+    if (!querySnapshot.size) {
+      return new Error("No such data");
+    }
+
+    querySnapshot.forEach(doc => data.push(doc.data()));
+
+    return data;
+  } catch (e) {
+    throw new Error(e);
   }
 };
 
-export default Firebase;
+export const post = async (dbCollection, documentId, payload) => {
+  try {
+    const dataRef = collection(db, dbCollection);
+    await setDoc(doc(dataRef, documentId), payload);
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const put = async (dbCollection, documentId, payload) => {
+  try {
+    await updateDoc(doc(db, dbCollection, documentId), payload);
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const deleteEntity = async (dbCollection, documentId) => {
+  try {
+    await deleteDoc(doc(db, dbCollection, documentId));
+  } catch (e) {
+    throw new Error(e);
+  }
+};
